@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cubaro Cards – Play a Digital Monster Card Game</title>
+<meta name="description" content="Collect Cubaros, open packs, evolve creatures, build decks and battle AI opponents in Cubaro Cards.">
+<meta property="og:title" content="Cubaro Cards – Play a Digital Monster Card Game">
+<meta property="og:description" content="Collect Cubaros, open packs, evolve creatures, build decks and battle AI opponents in Cubaro Cards.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="[cubarocards.com](https://cubarocards.com)">
+<meta name="theme-color" content="#0a0e1a">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- LOADING -->
+  <div id="loading-screen">
+    <div class="loading-logo">⬡ Cubaro Cards</div>
+    <div class="loading-sub">Collect. Evolve. Battle.</div>
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+  </div>
+
+  <!-- WELCOME MODAL -->
+  <div id="welcome-modal" class="overlay">
+    <div class="modal" style="text-align:center;border-color:var(--gold)">
+      <div style="font-size:3rem;margin-bottom:.5rem">🎉</div>
+      <h2 style="font-size:1.4rem;margin-bottom:.5rem">Welcome to Cubaro Cards!</h2>
+      <p style="color:var(--txt2);font-size:.85rem;margin-bottom:1rem">Your adventure begins now, Cubaro Trainer!</p>
+      <div id="welcome-rewards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem"></div>
+      <button class="btn bp btn-lg" onclick="closeWelcome()">⚔️ Start Playing!</button>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="logo" onclick="navigate('home')">⬡ Cubaro</div>
+    <div class="curr-row">
+      <div class="cb g" onclick="navigate('store')"><span>🪙</span><span id="hud-coins">0</span></div>
+      <div class="cb p" onclick="navigate('store')"><span>💎</span><span id="hud-crystals">0</span></div>
+      <div class="cb c"><span>⏳</span><span id="hud-tokens">0</span></div>
+      <div class="cb s"><span>🔷</span><span id="hud-shards">0</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+
+    <!-- HOME -->
+    <div id="page-home" class="page">
+      <div class="hero">
+        <div style="font-size:3.5rem;margin-bottom:.5rem">⬡</div>
+        <h1>Cubaro Cards</h1>
+        <div class="slogan">Collect Cubaros. Open Packs. Evolve. Battle Online.</div>
+        <div class="hero-btns">
+          <button class="btn bp btn-lg" onclick="navigate('battle')">⚔️ Play Now</button>
+          <button class="btn bg btn-lg" onclick="navigate('packs')">📦 Open Pack</button>
+          <button class="btn bpu" onclick="navigate('deck')">🃏 Build Deck</button>
+          <button class="btn bgh" onclick="navigate('collection')">📚 Collection</button>
+        </div>
+      </div>
+      <div id="home-features" class="feature-grid"></div>
+      <div style="margin-top:1.5rem;background:var(--bgc);border:1px solid var(--border);border-radius:12px;padding:1rem">
+        <h3 style="margin-bottom:.75rem;font-size:.95rem;color:var(--gold)">📖 Roadmap</h3>
+        <div id="roadmap-content"></div>
+      </div>
+    </div>
+
+    <!-- COLLECTION -->
+    <div id="page-collection" class="page">
+      <h2 class="page-title">📚 My Collection</h2>
+      <div id="collection-progress" style="margin-bottom:.75rem"></div>
+      <input class="search-input" id="col-search" placeholder="🔍 Search cards..." oninput="renderCollection()">
+      <div class="filter-row" id="col-type-filters"></div>
+      <div class="filter-row" id="col-element-filters"></div>
+      <div class="filter-row" id="col-rarity-filters"></div>
+      <div class="card-grid" id="collection-grid"></div>
+    </div>
+
+    <!-- PACKS -->
+    <div id="page-packs" class="page">
+      <h2 class="page-title">📦 Cubaro Packs</h2>
+      <p style="color:var(--txt2);font-size:.8rem;margin-bottom:1rem">Open packs to collect new Cubaros and cards!</p>
+      <div class="pack-grid" id="pack-grid"></div>
+      <div style="margin-top:1.5rem;background:var(--bgc);border:1px solid var(--border);border-radius:12px;padding:1rem">
+        <h3 style="font-size:.9rem;color:var(--gold);margin-bottom:.5rem">📊 Drop Rates</h3>
+        <div id="drop-rates-display"></div>
+      </div>
+    </div>
+
+    <!-- DECK BUILDER -->
+    <div id="page-deck" class="page">
+      <h2 class="page-title">🃏 Deck Builder</h2>
+      <div class="deck-builder-layout">
+        <div class="deck-panel" id="deck-left">
+          <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+            <button class="btn bp sm" onclick="saveDeck()">💾 Save Deck</button>
+            <button class="btn bg sm" onclick="autoCreateDeck()">⚡ Auto Build</button>
+            <button class="btn br sm" onclick="clearDeck()">🗑️ Clear</button>
+          </div>
+          <div id="deck-name-area" style="margin-bottom:.75rem">
+            <input class="search-input" id="deck-name-input" placeholder="Deck Name..." value="My Deck">
+          </div>
+          <div id="deck-stats" style="font-size:.75rem;color:var(--txt2);margin-bottom:.5rem"></div>
+          <div id="deck-warnings" style="margin-bottom:.5rem"></div>
+          <div id="current-deck-list" style="max-height:300px;overflow-y:auto"></div>
+        </div>
+        <div class="deck-panel" id="deck-right">
+          <h3 style="font-size:.9rem;margin-bottom:.5rem">Available Cards</h3>
+          <input class="search-input" id="deck-search" placeholder="🔍 Search..." oninput="renderDeckBuilder()">
+          <div class="filter-row" id="deck-type-filters"></div>
+          <div class="filter-row" id="deck-el-filters"></div>
+          <div id="deck-available-list" style="max-height:400px;overflow-y:auto"></div>
+        </div>
+      </div>
+      <div style="margin-top:1rem">
+        <h3 style="font-size:.9rem;margin-bottom:.5rem;color:var(--gold)">💾 Saved Decks</h3>
+        <div id="saved-decks-list"></div>
+      </div>
+    </div>
+
+    <!-- BATTLE -->
+    <div id="page-battle" class="page" style="padding:.5rem">
+      <div id="battle-setup" style="text-align:center;padding:1.5rem">
+        <div style="font-size:3rem;margin-bottom:.75rem">⚔️</div>
+        <h2 style="margin-bottom:.5rem">Battle Arena</h2>
+        <p style="color:var(--txt2);font-size:.85rem;margin-bottom:1.5rem">Challenge AI opponents and earn Victory Points!</p>
+        <div id="battle-deck-selector" style="margin-bottom:1.5rem"></div>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+          <button class="btn bp btn-lg" onclick="startBattle('normal')">⚔️ Normal Battle</button>
+          <button class="btn bg btn-lg" onclick="startBattle('elite')">🔥 Elite Battle</button>
+          <button class="btn br btn-lg" onclick="startBattle('boss')">💀 Boss Battle</button>
+        </div>
+        <div style="margin-top:1.5rem;background:var(--bgc);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:left">
+          <h3 style="font-size:.9rem;margin-bottom:.5rem;color:var(--gold)">📊 Battle Record</h3>
+          <div id="battle-record"></div>
+        </div>
+      </div>
+      <div id="battle-board" style="display:none"></div>
+    </div>
+
+    <!-- ADVENTURE -->
+    <div id="page-adventure" class="page">
+      <h2 class="page-title">🗺️ Cubaro World Map</h2>
+      <p style="color:var(--txt2);font-size:.8rem;margin-bottom:1rem">Explore the world, battle enemies, and earn rewards!</p>
+      <div class="adventure-map" id="adventure-map"></div>
+      <div id="node-modal" class="overlay">
+        <div class="modal">
+          <button class="modal-close" onclick="closeModal('node-modal')">✕</button>
+          <div id="node-modal-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOURNAMENT -->
+    <div id="page-tournament" class="page">
+      <h2 class="page-title">🏆 Cubaro Cup</h2>
+      <p style="color:var(--txt2);font-size:.8rem;margin-bottom:1rem">Compete in tournaments and win exclusive rewards!</p>
+      <div id="tournament-list"></div>
+      <div id="tournament-bracket-modal" class="overlay">
+        <div class="modal" style="max-width:560px">
+          <button class="modal-close" onclick="closeModal('tournament-bracket-modal')">✕</button>
+          <div id="tournament-bracket-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRADING -->
+    <div id="page-trading" class="page">
+      <h2 class="page-title">🔄 Trading</h2>
+      <div class="trade-notice">⚠️ Server-side validation required for live trading. This version uses NPC mock trades.</div>
+      <h3 style="font-size:.9rem;margin-bottom:.75rem;color:var(--gold);margin-top:1rem">🤖 NPC Trade Offers</h3>
+      <div id="npc-trades"></div>
+      <h3 style="font-size:.9rem;margin-bottom:.75rem;color:var(--blue);margin-top:1rem">📋 Trade History</h3>
+      <div id="trade-history"></div>
+    </div>
+
+    <!-- CRAFTING -->
+    <div id="page-crafting" class="page">
+      <h2 class="page-title">⚗️ Crafting</h2>
+      <div id="crafting-shards" style="margin-bottom:1rem"></div>
+      <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap" id="craft-rarity-filters"></div>
+      <div class="craft-grid" id="crafting-grid"></div>
+    </div>
+
+    <!-- STORE -->
+    <div id="page-store" class="page">
+      <h2 class="page-title">🛒 Store</h2>
+      <div id="store-content"></div>
+    </div>
+
+    <!-- DAILY -->
+    <div id="page-daily" class="page">
+      <h2 class="page-title">🎁 Daily Rewards</h2>
+      <div id="daily-streak" style="margin-bottom:1rem"></div>
+      <div class="reward-grid" id="reward-grid"></div>
+      <div style="text-align:center;margin-top:1rem" id="daily-claim-area"></div>
+      <div style="margin-top:2rem;background:var(--bgc);border:1px solid var(--border);border-radius:12px;padding:1rem">
+        <h3 style="font-size:.9rem;color:var(--gold);margin-bottom:.75rem">📺 Free Daily Crystals</h3>
+        <p style="font-size:.75rem;color:var(--txt2);margin-bottom:.75rem">Watch a short ad to earn free Cubaro Crystals!</p>
+        <div id="rewarded-ads-area"></div>
+        <p style="font-size:.65rem;color:var(--txt2);margin-top:.5rem">* Real ad network can be connected later. Max 3 per day.</p>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="page-profile" class="page">
+      <div id="profile-header"></div>
+      <div class="stat-grid" id="profile-stats"></div>
+      <div style="margin-top:1rem;background:var(--bgc);border:1px solid var(--border);border-radius:12px;padding:1rem">
+        <h3 style="font-size:.9rem;margin-bottom:.5rem;color:var(--gold)">🃏 Active Deck</h3>
+        <div id="active-deck-display"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="page">
+      <h2 class="page-title">⚙️ Settings</h2>
+      <div id="settings-content"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="page-admin" class="page">
+      <h2 class="page-title">🔧 Card Manager</h2>
+      <div id="admin-content"></div>
+    </div>
+
+    <!-- LEGAL -->
+    <div id="page-legal" class="page">
+      <h2 class="page-title">📜 Legal</h2>
+      <div id="legal-tabs" style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem"></div>
+      <div id="legal-content" class="legal-content"></div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- BOTTOM NAV -->
+  <div id="bottomnav">
+    <div class="bni" onclick="navigate('home')" data-page="home"><span class="ic">🏠</span><span>Home</span></div>
+    <div class="bni" onclick="navigate('battle')" data-page="battle"><span class="ic">⚔️</span><span>Battle</span></div>
+    <div class="bni" onclick="navigate('packs')" data-page="packs"><span class="ic">📦</span><span>Packs</span></div>
+    <div class="bni" onclick="navigate('collection')" data-page="collection"><span class="ic">📚</span><span>Cards</span></div>
+    <div class="bni" onclick="navigate('deck')" data-page="deck"><span class="ic">🃏</span><span>Deck</span></div>
+    <div class="bni" onclick="navigate('adventure')" data-page="adventure"><span class="ic">🗺️</span><span>World</span></div>
+    <div class="bni" onclick="navigate('daily')" data-page="daily"><span class="ic">🎁</span><span>Daily</span></div>
+    <div class="bni" onclick="navigate('profile')" data-page="profile"><span class="ic">👤</span><span>Profile</span></div>
+    <div class="bni" onclick="showMoreMenu()" data-page="more"><span class="ic">☰</span><span>More</span></div>
+  </div>
+
+  <!-- MORE MENU -->
+  <div id="more-menu" class="overlay">
+    <div class="modal" style="max-width:340px">
+      <button class="modal-close" onclick="closeModal('more-menu')">✕</button>
+      <h2>More</h2>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem">
+        <button class="btn bgh" onclick="navigate('tournament');closeModal('more-menu')">🏆 Tournaments</button>
+        <button class="btn bgh" onclick="navigate('trading');closeModal('more-menu')">🔄 Trading</button>
+        <button class="btn bgh" onclick="navigate('crafting');closeModal('more-menu')">⚗️ Crafting</button>
+        <button class="btn bgh" onclick="navigate('store');closeModal('more-menu')">🛒 Store</button>
+        <button class="btn bgh" onclick="navigate('settings');closeModal('more-menu')">⚙️ Settings</button>
+        <button class="btn bgh" onclick="navigate('admin');closeModal('more-menu')">🔧 Admin</button>
+        <button class="btn bgh" onclick="navigate('legal');closeModal('more-menu')">📜 Legal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD DETAIL MODAL -->
+  <div id="card-detail-modal" class="overlay">
+    <div class="modal" style="max-width:380px">
+      <button class="modal-close" onclick="closeModal('card-detail-modal')">✕</button>
+      <div id="card-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- PACK ANIMATION -->
+  <div id="pack-anim" style="position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem">
+    <h2 style="margin-bottom:1rem;font-size:1.3rem;color:var(--gold)">✨ Pack Opened!</h2>
+    <div id="pack-reveal-cards" style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;max-width:680px"></div>
+    <div style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center">
+      <button class="btn bp" onclick="closePackAnim()">✅ Collect All</button>
+      <button class="btn bg" onclick="openAnotherPack()">📦 Open Another</button>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toasts"></div>
+
+</div><!-- /app -->
+
+<script src="cards.js"></script>
+<script src="game.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
